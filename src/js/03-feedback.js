@@ -1,24 +1,23 @@
 const inputEl = document.querySelector('.feedback-form');
 const LOCALSTRKEY = 'feedback-form-state';
 const throttle = require('lodash.throttle');
+let formData = {};
 
-const onClick = () => {
-  const email = inputEl.elements.email.value;
-  const message = inputEl.elements.message.value;
-  localStorage.setItem(LOCALSTRKEY, JSON.stringify({ email, message }));
+const onInput = e => {
+  formData[e.target.name] = e.target.value.trim();
+  localStorage.setItem(LOCALSTRKEY, JSON.stringify(formData));
 };
 
-inputEl.addEventListener('input', throttle(onClick, 500));
+inputEl.addEventListener('input', throttle(onInput, 500));
 
 const automatInputForm = () => {
   const inputFormContent = localStorage.getItem(LOCALSTRKEY);
   if (!inputFormContent) return;
 
-  const inputFormContentEl = JSON.parse(inputFormContent);
-  const keys = Object.keys(inputFormContentEl);
-
+  formData = JSON.parse(inputFormContent);
+  const keys = Object.keys(formData);
   for (let key of keys) {
-    inputEl.elements[key].value = inputFormContentEl[key];
+    inputEl.elements[key].value = formData[key];
   }
 };
 
@@ -26,10 +25,7 @@ window.addEventListener('load', automatInputForm);
 
 const clearForm = e => {
   e.preventDefault();
-  const email = e.target.email.value;
-  const message = e.target.message.value;
-
-  console.log({ email: email, message: message });
+  console.log(formData);
   localStorage.removeItem(LOCALSTRKEY);
   inputEl.reset();
 };
